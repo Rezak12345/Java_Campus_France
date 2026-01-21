@@ -2,56 +2,55 @@ name: CI - Tests CampusFrance (Windows)
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
 
 jobs:
   test:
     runs-on: windows-latest
     env:
-      CI: "true"   # pour ton code Edge headless
+      CI: "true"
 
     steps:
-      # 1. Checkout du repo
+      # 1. Récupération du code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2. Setup Java 17
+      # 2. Java 17
       - name: Set up Java 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 3. Cache Maven packages
+      # 3. Cache Maven
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: C:\Users\runneradmin\.m2\repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4. Install Microsoft Edge WebDriver
+      # 4. Edge WebDriver
       - name: Install Edge WebDriver
-        run: choco install microsoft-edge-driver --version=117.0.2045.43 -y
+        run: choco install microsoft-edge-driver --version=latest -y
 
-      # 5. Build project
+      # 5. Build
       - name: Build project
         run: mvn clean compile
 
-      # 6. Run Cucumber tests
+      # 6. Tests Cucumber
       - name: Run Cucumber tests
         run: mvn test -Dcucumber.options="--plugin json:target/cucumber.json"
 
-      # 7. Generate Cucumber HTML report
+      # 7. Génération du rapport HTML
       - name: Generate Cucumber HTML report
         run: mvn verify
 
-      # 8. Upload HTML report
+      # 8. Upload du rapport HTML (v4)
       - name: Upload Cucumber HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cucumber-html-report
           path: target\cucumber-report-html
