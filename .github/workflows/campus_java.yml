@@ -12,19 +12,16 @@ jobs:
       CI: "true"
 
     steps:
-      # 1. Récupération du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Java 17
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 3. Cache Maven
-      - name: Cache Maven packages
+      - name: Cache Maven
         uses: actions/cache@v4
         with:
           path: C:\Users\runneradmin\.m2\repository
@@ -32,23 +29,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4. Edge WebDriver
-      - name: Install Edge WebDriver
-        run: choco install microsoft-edge-driver --version=latest -y
-
-      # 5. Build
+      # Selenium 4 gère automatiquement EdgeDriver
       - name: Build project
         run: mvn clean compile
 
-      # 6. Tests Cucumber
       - name: Run Cucumber tests
         run: mvn test -Dcucumber.options="--plugin json:target/cucumber.json"
 
-      # 7. Génération du rapport HTML
       - name: Generate Cucumber HTML report
         run: mvn verify
 
-      # 8. Upload du rapport HTML (v4)
       - name: Upload Cucumber HTML report
         uses: actions/upload-artifact@v4
         with:
