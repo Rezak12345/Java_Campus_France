@@ -1,27 +1,30 @@
-name: Cucumber Selenium Tests (Edge)
+name: CI - Tests CampusFrance (Windows)
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
 
 jobs:
-  cucumber-selenium-tests:
+  test:
     runs-on: windows-latest
+    env:
+      CI: "true"   # pour ton code Edge headless
 
     steps:
-      # 1️⃣ Checkout du code
+      # 1. Checkout du repo
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      # 2️⃣ Setup Java 17
-      - name: Set up JDK 17
+      # 2. Setup Java 17
+      - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Cache Maven
+      # 3. Cache Maven packages
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,33 +33,25 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4️⃣ Trouver le dossier Maven
-      - name: Find Maven project
-        id: find-maven
-        shell: pwsh
-        run: |
-          $pom = Get-ChildItem -Path $PWD -Filter pom.xml -Recurse | Select-Object -First 1
-          if (-not $pom) { throw "No pom.xml found" }
-          $dir = Split-Path $pom.FullName
-          echo "MAVEN_DIR=$dir" >> $env:GITHUB_ENV
-          Write-Host "Maven project in: $dir"
+      # 4. Install Microsoft Edge WebDriver
+      - name: Install Edge WebDriver
+        run: choco install microsoft-edge-driver --version=117.0.2045.43 -y
 
-      # 5️⃣ Build (skip tests)
-      - name: Build (skip tests)
-        run: mvn clean install -DskipTests
-        working-directory: ${{ env.MAVEN_DIR }}
+      # 5. Build project
+      - name: Build project
+        run: mvn clean compile
 
-      # 6️⃣ Run Cucumber/Selenium tests
-      - name: Run Selenium/Cucumber tests
-        env:
-          CI: true   # Indique au code qu'on est en CI pour headless
-        run: mvn test -B
-        working-directory: ${{ env.MAVEN_DIR }}
+      # 6. Run Cucumber tests
+      - name: Run Cucumber tests
+        run: mvn test -Dcucumber.options="--plugin json:target/cucumber.json"
 
-      # 7️⃣ Archive rapport HTML
-      - name: Archive Surefire / Cucumber HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
+      # 7. Generate Cucumber HTML report
+      - name: Generate Cucumber HTML report
+        run: mvn verify
+
+      # 8. Upload HTML report
+      - name: Upload Cucumber HTML report
+        uses: actions/upload-artifact@v3
         with:
-          name: cucumber-selenium-html-report
-          path: ${{ env.MAVEN_DIR }}/target/surefire-reports
+          name: cucumber-html-report
+          path: target\cucumber-report-html
