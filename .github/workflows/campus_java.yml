@@ -1,4 +1,4 @@
-name: CI - Tests CampusFrance
+name: CI - CampusFrance Tests
 
 on:
   push:
@@ -9,21 +9,18 @@ jobs:
   test:
     runs-on: windows-latest
     env:
-      CI: "true"   # Edge headless
+      CI: "true"
 
     steps:
-      # 1️⃣ Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer Java 17
-      - name: Set up Java
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Cache Maven
       - name: Cache Maven
         uses: actions/cache@v4
         with:
@@ -32,21 +29,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4️⃣ Build
       - name: Build project
         run: mvn clean compile
 
-      # 5️⃣ Lancer les tests Cucumber
       - name: Run Cucumber tests
         run: mvn test
 
-      # 6️⃣ Générer le rapport HTML
-      - name: Generate Cucumber HTML report
-        run: mvn verify
-
-      # 7️⃣ Upload du rapport HTML
       - name: Upload Cucumber HTML report
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-html-report
-          path: target\cucumber-report-html
+          path: target\cucumber-html-report
