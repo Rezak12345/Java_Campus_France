@@ -1,4 +1,4 @@
-name: CI - Tests CampusFrance (Windows)
+name: CI - Tests CampusFrance
 
 on:
   push:
@@ -9,18 +9,21 @@ jobs:
   test:
     runs-on: windows-latest
     env:
-      CI: "true"
+      CI: "true"   # active le mode headless Edge
 
     steps:
+      # 1. Récupération du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      # 2. Java 17
+      - name: Set up Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # 3. Cache Maven
       - name: Cache Maven
         uses: actions/cache@v4
         with:
@@ -29,16 +32,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Selenium 4 gère automatiquement EdgeDriver
+      # 4. Build
       - name: Build project
         run: mvn clean compile
 
+      # 5. Lancer Cucumber
       - name: Run Cucumber tests
-        run: mvn test -Dcucumber.options="--plugin json:target/cucumber.json"
+        run: mvn test
 
+      # 6. Générer le rapport HTML
       - name: Generate Cucumber HTML report
         run: mvn verify
 
+      # 7. Upload du rapport
       - name: Upload Cucumber HTML report
         uses: actions/upload-artifact@v4
         with:
