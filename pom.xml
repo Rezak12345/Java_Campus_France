@@ -16,11 +16,10 @@
         <cucumber.version>7.18.0</cucumber.version>
         <selenium.version>4.24.0</selenium.version>
         <gson.version>2.10.1</gson.version>
-        <maven.cucumber.report.version>5.7.0</maven.cucumber.report.version>
     </properties>
 
     <dependencies>
-        <!-- CUCUMBER -->
+        <!-- Cucumber -->
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
@@ -33,14 +32,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- SELENIUM -->
+        <!-- Selenium -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
         </dependency>
 
-        <!-- GSON -->
+        <!-- Gson -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -58,8 +57,7 @@
 
     <build>
         <plugins>
-
-            <!-- Lance le runner Cucumber -->
+            <!-- Maven Surefire pour lancer le runner -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -70,30 +68,6 @@
                     </includes>
                 </configuration>
             </plugin>
-
-            <!-- Génère le rapport HTML -->
-            <plugin>
-                <groupId>net.masterthought</groupId>
-                <artifactId>maven-cucumber-reporting</artifactId>
-                <version>${maven.cucumber.report.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-cucumber-html-report</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <projectName>CampusFrance Cucumber Tests</projectName>
-                            <outputDirectory>${project.build.directory}/cucumber-report-html</outputDirectory>
-                            <jsonFiles>
-                                <param>${project.build.directory}/cucumber.json</param>
-                            </jsonFiles>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 
