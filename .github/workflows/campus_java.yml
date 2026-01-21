@@ -1,4 +1,4 @@
-name: Cucumber Selenium Tests (Edge)
+name: Selenium Cucumber Tests (Edge - Headless)
 
 on:
   push:
@@ -6,22 +6,19 @@ on:
   pull_request:
 
 jobs:
-  cucumber-tests:
+  selenium-cucumber-tests:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout du repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Installer JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Cache Maven packages pour accélérer les builds
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,7 +27,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4️⃣ Trouver le projet Maven
       - name: Find Maven project
         id: find-maven
         shell: pwsh
@@ -41,25 +37,10 @@ jobs:
           echo "MAVEN_DIR=$dir" >> $env:GITHUB_ENV
           Write-Host "Maven project in: $dir"
 
-      # 5️⃣ Build Maven (sans tests pour installer les dépendances)
       - name: Build (skip tests)
         run: mvn clean install -DskipTests
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 6️⃣ Lancer les tests Cucumber + Selenium
-      - name: Run Cucumber Selenium tests
+      - name: Run Selenium/Cucumber tests
         run: mvn test -B
         working-directory: ${{ env.MAVEN_DIR }}
-
-      # 7️⃣ Générer le rapport HTML Cucumber
-      - name: Generate Cucumber HTML report
-        run: mvn verify
-        working-directory: ${{ env.MAVEN_DIR }}
-
-      # 8️⃣ Upload du rapport HTML comme artefact
-      - name: Upload Cucumber HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: cucumber-html-report
-          path: ${{ env.MAVEN_DIR }}/target/cucumber-report-html
