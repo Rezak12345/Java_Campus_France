@@ -10,18 +10,18 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout du repository
+      # Checkout du repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Java 17
+      # Setup Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Cache Maven local repo
+      # Cache Maven local repo
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4️⃣ Trouver le dossier contenant le pom.xml
+      # Trouver le dossier contenant le pom.xml
       - name: Find Maven project
         id: find-maven
         shell: pwsh
@@ -41,17 +41,17 @@ jobs:
           echo "MAVEN_DIR=$dir" >> $env:GITHUB_ENV
           Write-Host "Maven project in: $dir"
 
-      # 5️⃣ Build Maven (skip tests)
+      # Build Maven (skip tests)
       - name: Build project
         run: mvn clean install -DskipTests
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 6️⃣ Run Selenium / Cucumber tests
+      # Run Selenium / Cucumber tests
       - name: Run Cucumber Selenium Tests
         run: mvn test -B
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 7️⃣ Generate Cucumber HTML report
+      # Generate Cucumber HTML report
       - name: Generate Cucumber HTML report
         run: |
           mvn io.cucumber:cucumber-reporting:5.7.0:report \
@@ -59,7 +59,7 @@ jobs:
           -Dcucumber.report.outputDirectory=target/cucumber-report
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 8️⃣ Upload HTML report as artifact
+      # Upload HTML report as artifact
       - name: Upload Cucumber HTML Report
         uses: actions/upload-artifact@v3
         with:
