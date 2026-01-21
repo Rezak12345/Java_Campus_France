@@ -1,4 +1,4 @@
-name: Cucumber Selenium Tests (Edge - Headless)
+name: Cucumber Selenium Tests (Edge)
 
 on:
   push:
@@ -6,22 +6,22 @@ on:
   pull_request:
 
 jobs:
-  cucumber-tests:
+  cucumber-selenium-tests:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout repository
+      # 1️⃣ Checkout du code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Set up JDK 17
+      # 2️⃣ Setup Java 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17
 
-      # 3️⃣ Cache Maven dependencies
+      # 3️⃣ Cache Maven
       - name: Cache Maven packages
         uses: actions/cache@v3
         with:
@@ -30,7 +30,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4️⃣ Find Maven project directory
+      # 4️⃣ Trouver le dossier Maven
       - name: Find Maven project
         id: find-maven
         shell: pwsh
@@ -41,20 +41,22 @@ jobs:
           echo "MAVEN_DIR=$dir" >> $env:GITHUB_ENV
           Write-Host "Maven project in: $dir"
 
-      # 5️⃣ Build project (skip tests)
+      # 5️⃣ Build (skip tests)
       - name: Build (skip tests)
         run: mvn clean install -DskipTests
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 6️⃣ Run Cucumber Selenium tests
-      - name: Run Cucumber tests
+      # 6️⃣ Run Cucumber/Selenium tests
+      - name: Run Selenium/Cucumber tests
+        env:
+          CI: true   # Indique au code qu'on est en CI pour headless
         run: mvn test -B
         working-directory: ${{ env.MAVEN_DIR }}
 
-      # 7️⃣ Archive Cucumber HTML report
-      - name: Upload Cucumber HTML report
+      # 7️⃣ Archive rapport HTML
+      - name: Archive Surefire / Cucumber HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cucumber-html-report
-          path: ${{ env.MAVEN_DIR }}/target/cucumber-report-html
+          name: cucumber-selenium-html-report
+          path: ${{ env.MAVEN_DIR }}/target/surefire-reports
