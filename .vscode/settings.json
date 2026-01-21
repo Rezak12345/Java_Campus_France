@@ -1,0 +1,9 @@
+{
+    "cucumber.featuresFolder": "src/test/resources/features",
+    "cucumber.glueFolder": "src/main/java/steps",
+    "behave-vsc.featuresPath": "src/test/resources/features",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar"
+    ],
+    "java.compile.nullAnalysis.mode": "automatic"
+}

@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Debug Cucumber JUnit",
+            "request": "launch",
+            "mainClass": "runners.CucumberMain",
+            "projectName": "java_campus",
+            "stopOnEntry": false,
+            "console": "internalConsole",
+            "args": []
+        },
+        {
+            "type": "java",
+            "name": "Attach Maven Surefire Debug", 
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005
+        },
+        {
+            "type": "java",
+            "name": "Attach Maven Debug (Custom Port)",
+            "request": "attach",
+            "hostName": "localhost", 
+            "port": 8000
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+package tests;
+
+import org.junit.runner.JUnitCore;
+import runners.CucumberMain;
+
+public class RunCucumberTest {
+    public static void main(String[] args) {
+        JUnitCore.runClasses(CucumberMain.class);
+    }
+}
