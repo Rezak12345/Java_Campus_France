@@ -2,7 +2,7 @@ name: Selenium Cucumber Tests (Edge - Headless)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
 
 jobs:
@@ -37,10 +37,24 @@ jobs:
           echo "MAVEN_DIR=$dir" >> $env:GITHUB_ENV
           Write-Host "Maven project in: $dir"
 
-      - name: Build (skip tests)
+      - name: Build project (skip tests)
         run: mvn clean install -DskipTests
         working-directory: ${{ env.MAVEN_DIR }}
 
-      - name: Run Selenium/Cucumber tests
-        run: mvn test -B
+      - name: Run Selenium/Cucumber tests with JSON report
+        run: mvn test -B -Dcucumber.options="--plugin json:target/cucumber.json"
+        working-directory: ${{ env.MAVEN_DIR }}
+
+      - name: Check if Cucumber JSON exists
+        shell: pwsh
+        run: |
+          if (-Not (Test-Path "${{ env.MAVEN_DIR }}\target\cucumber.json")) {
+              Write-Host "Cucumber JSON report not found. Skipping HTML report generation."
+              exit 0
+          } else {
+              Write-Host "Cucumber JSON report found."
+          }
+
+      - name: Generate Cucumber HTML report
+        run: mvn verify
         working-directory: ${{ env.MAVEN_DIR }}
